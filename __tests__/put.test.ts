@@ -15,6 +15,7 @@ test('put', () => {
   chess.clear()
 
   const piece: Piece = {
+    id: 'a1',
     type: ROOK,
     color: BLACK,
   }
@@ -34,19 +35,19 @@ test('put', () => {
 test('put - bad piece', () => {
   const chess = new Chess()
   expect(
-    chess.put({ type: 'bad-piece' as PieceSymbol, color: WHITE }, 'a7')
+    chess.put({ id: 'a7', type: 'bad-piece' as PieceSymbol, color: WHITE }, 'a7')
   ).toEqual(false)
 })
 
 test('put - bad square', () => {
   const chess = new Chess()
-  expect(chess.put({ type: PAWN, color: WHITE }, 'a9' as Square)).toEqual(false)
+  expect(chess.put({ id: '', type: PAWN, color: WHITE }, 'a9' as Square)).toEqual(false)
 })
 
 test('put - disallow two white kings', () => {
   const chess = new Chess()
   chess.clear()
-  const piece: Piece = { type: KING, color: WHITE }
+  const piece: Piece = { id: 'a2', type: KING, color: WHITE }
   expect(chess.put(piece, 'a2')).toEqual(true)
   expect(chess.put(piece, 'a3')).toEqual(false)
 })
@@ -54,7 +55,7 @@ test('put - disallow two white kings', () => {
 test('put - disallow two black kings', () => {
   const chess = new Chess()
   chess.clear()
-  const piece: Piece = { type: KING, color: BLACK }
+  const piece: Piece = { id: 'e8', type: KING, color: BLACK }
   expect(chess.put(piece, 'e8')).toEqual(true)
   expect(chess.put(piece, 'd8')).toEqual(false)
 })
@@ -62,7 +63,7 @@ test('put - disallow two black kings', () => {
 test('put - allow two kings if overwriting the same square', () => {
   const chess = new Chess()
   chess.clear()
-  const piece: Piece = { type: KING, color: WHITE }
+  const piece: Piece = { id: 'a2', type: KING, color: WHITE }
   expect(chess.put(piece, 'a2')).toEqual(true)
   expect(chess.put(piece, 'a2')).toEqual(true)
 })

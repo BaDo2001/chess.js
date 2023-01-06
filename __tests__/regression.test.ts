@@ -24,8 +24,8 @@ describe('Regression Tests', () => {
 
   it('Github Issue #58 - placing more than one king', () => {
     const chess = new Chess('N3k3/8/8/8/8/8/5b2/4K3 w - - 0 1')
-    expect(chess.put({ type: 'k', color: 'w' }, 'a1')).toBe(false)
-    chess.put({ type: 'q', color: 'w' }, 'a1')
+    expect(chess.put({ id: 'a1', type: 'k', color: 'w' }, 'a1')).toBe(false)
+    chess.put({ id: 'a1', type: 'q', color: 'w' }, 'a1')
     chess.remove('a1')
     expect(chess.moves().join(' ')).toBe('Kd2 Ke2 Kxf2 Kf1 Kd1')
   })
