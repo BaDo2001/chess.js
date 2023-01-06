@@ -52,6 +52,7 @@ export const DEFAULT_POSITION =
   'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 
 export type Piece = {
+  id: string
   color: Color
   type: PieceSymbol
 }
@@ -61,7 +62,7 @@ type InternalMove = {
   from: number
   to: number
   piece: PieceSymbol
-  captured?: PieceSymbol
+  captured?: Piece
   promotion?: PieceSymbol
   flags: number
 }
@@ -454,7 +455,7 @@ function addMove(
   from: number,
   to: number,
   piece: PieceSymbol,
-  captured: PieceSymbol | undefined = undefined,
+  captured: Piece | undefined = undefined,
   flags: number = BITS.NORMAL
 ) {
   const r = rank(to)
@@ -565,9 +566,14 @@ export class Chess {
         square += parseInt(piece, 10)
       } else {
         const color = piece < 'a' ? WHITE : BLACK
+        const algebraicSquare = algebraic(square)
         this.put(
-          { type: piece.toLowerCase() as PieceSymbol, color },
-          algebraic(square)
+          {
+            id: algebraicSquare,
+            type: piece.toLowerCase() as PieceSymbol,
+            color,
+          },
+          algebraicSquare
         )
         square++
       }
@@ -680,7 +686,10 @@ export class Chess {
     return this._board[Ox88[square]] || false
   }
 
-  put({ type, color }: { type: PieceSymbol; color: Color }, square: Square) {
+  put(
+    { id, type, color }: { id: string; type: PieceSymbol; color: Color },
+    square: Square
+  ) {
     /* check for piece */
     if (SYMBOLS.indexOf(type.toLowerCase()) === -1) {
       return false
@@ -701,7 +710,7 @@ export class Chess {
       return false
     }
 
-    this._board[sq] = { type: type as PieceSymbol, color: color as Color }
+    this._board[sq] = { id, type: type as PieceSymbol, color: color as Color }
 
     if (type === KING) {
       this._kings[color] = sq
@@ -1000,11 +1009,13 @@ export class Chess {
               from,
               to,
               PAWN,
-              this._board[to].type,
+              this._board[to],
               BITS.CAPTURE
             )
           } else if (to === this._epSquare) {
-            addMove(moves, us, from, to, PAWN, PAWN, BITS.EP_CAPTURE)
+            const capturedPawn = us === BLACK ? this._board[to - 16] : this._board[to + 16];
+
+            addMove(moves, us, from, to, PAWN,  capturedPawn, BITS.EP_CAPTURE)
           }
         }
       } else {
@@ -1024,15 +1035,7 @@ export class Chess {
               // own color, stop loop
               if (this._board[to].color === us) break
 
-              addMove(
-                moves,
-                us,
-                from,
-                to,
-                type,
-                this._board[to].type,
-                BITS.CAPTURE
-              )
+              addMove(moves, us, from, to, type, this._board[to], BITS.CAPTURE)
               break
             }
 
@@ -1202,7 +1205,11 @@ export class Chess {
 
     /* if pawn promotion, replace with new piece */
     if (move.promotion) {
-      this._board[move.to] = { type: move.promotion, color: us }
+      this._board[move.to] = {
+        id: this._board[move.to].id,
+        type: move.promotion,
+        color: us,
+      }
     }
 
     /* if we moved the king */
@@ -1315,10 +1322,14 @@ export class Chess {
         } else {
           index = move.to + 16
         }
-        this._board[index] = { type: PAWN, color: them }
+        this._board[index] = { id: move.captured.id, type: PAWN, color: them }
       } else {
         // regular capture
-        this._board[move.to] = { type: move.captured, color: them }
+        this._board[move.to] = {
+          id: move.captured.id,
+          type: move.captured.type,
+          color: them,
+        }
       }
     }
 
@@ -1953,7 +1964,7 @@ export class Chess {
     }
 
     if (captured) {
-      move.captured = captured
+      move.captured = captured.type
     }
     if (promotion) {
       move.promotion = promotion

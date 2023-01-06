@@ -2,7 +2,7 @@ import { Chess, Square, QUEEN, WHITE } from '../src/chess'
 
 test('remove - returns piece', () => {
   const chess = new Chess()
-  expect(chess.remove('d1')).toEqual({ type: QUEEN, color: WHITE })
+  expect(chess.remove('d1')).toEqual({ id: 'd1', type: QUEEN, color: WHITE })
   expect(chess.get('d1')).toEqual(false)
 })
 
