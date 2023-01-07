@@ -1986,6 +1986,7 @@ export class Chess {
         row.push(null)
       } else {
         row.push({
+          id: this._board[i].id,
           square: algebraic(i),
           type: this._board[i].type,
           color: this._board[i].color,
