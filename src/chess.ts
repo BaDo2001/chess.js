@@ -705,7 +705,7 @@ export class Chess {
             from: square,
             to: this._epSquare,
             piece: PAWN,
-            captured: PAWN,
+            captured: this._board[bigPawnSquare],
             flags: BITS.EP_CAPTURE,
           })
           const isLegal = !this._isKingAttacked(color)
