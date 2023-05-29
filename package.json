@@ -8,6 +8,7 @@
   "homepage": "https://github.com/jhlywa/chess.js",
   "author": "Jeff Hlywa <jhlywa@gmail.com>",
   "scripts": {
+    "postinstall": "npm run build",
     "test": "jest",
     "lint": "eslint src/ --ext .ts",
     "build": "tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
